@@ -1,0 +1,210 @@
+
+pwm.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0000012c  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  0000012c  000001a0  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .stab         00000ca8  00000000  00000000  000001a0  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  3 .stabstr      00000bd5  00000000  00000000  00000e48  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  4 .comment      00000011  00000000  00000000  00001a1d  2**0
+                  CONTENTS, READONLY
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   8:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  10:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  14:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  18:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  1c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  20:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  24:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  28:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  2c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  30:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  34:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  38:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  3c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  40:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  44:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  48:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  4c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  50:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d4 e0       	ldi	r29, 0x04	; 4
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+  60:	0e 94 5e 00 	call	0xbc	; 0xbc <main>
+  64:	0c 94 94 00 	jmp	0x128	; 0x128 <_exit>
+
+00000068 <__bad_interrupt>:
+  68:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000006c <initPWM>:
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+
+void initPWM()
+{
+  6c:	cf 93       	push	r28
+  6e:	df 93       	push	r29
+  70:	cd b7       	in	r28, 0x3d	; 61
+  72:	de b7       	in	r29, 0x3e	; 62
+	TCCR0 |= (1 << WGM00) | (1 << WGM01) | (1 << COM01) | (1 << CS00);
+  74:	83 e5       	ldi	r24, 0x53	; 83
+  76:	90 e0       	ldi	r25, 0x00	; 0
+  78:	23 e5       	ldi	r18, 0x53	; 83
+  7a:	30 e0       	ldi	r19, 0x00	; 0
+  7c:	f9 01       	movw	r30, r18
+  7e:	20 81       	ld	r18, Z
+  80:	29 66       	ori	r18, 0x69	; 105
+  82:	fc 01       	movw	r30, r24
+  84:	20 83       	st	Z, r18
+	DDRB |= (1<<PB3);
+  86:	87 e3       	ldi	r24, 0x37	; 55
+  88:	90 e0       	ldi	r25, 0x00	; 0
+  8a:	27 e3       	ldi	r18, 0x37	; 55
+  8c:	30 e0       	ldi	r19, 0x00	; 0
+  8e:	f9 01       	movw	r30, r18
+  90:	20 81       	ld	r18, Z
+  92:	28 60       	ori	r18, 0x08	; 8
+  94:	fc 01       	movw	r30, r24
+  96:	20 83       	st	Z, r18
+}
+  98:	df 91       	pop	r29
+  9a:	cf 91       	pop	r28
+  9c:	08 95       	ret
+
+0000009e <setDuty>:
+
+void setDuty(uint8_t duty)
+{
+  9e:	cf 93       	push	r28
+  a0:	df 93       	push	r29
+  a2:	1f 92       	push	r1
+  a4:	cd b7       	in	r28, 0x3d	; 61
+  a6:	de b7       	in	r29, 0x3e	; 62
+  a8:	89 83       	std	Y+1, r24	; 0x01
+	OCR0 = duty;
+  aa:	8c e5       	ldi	r24, 0x5C	; 92
+  ac:	90 e0       	ldi	r25, 0x00	; 0
+  ae:	29 81       	ldd	r18, Y+1	; 0x01
+  b0:	fc 01       	movw	r30, r24
+  b2:	20 83       	st	Z, r18
+}
+  b4:	0f 90       	pop	r0
+  b6:	df 91       	pop	r29
+  b8:	cf 91       	pop	r28
+  ba:	08 95       	ret
+
+000000bc <main>:
+
+int main(void)
+{
+  bc:	cf 93       	push	r28
+  be:	df 93       	push	r29
+  c0:	00 d0       	rcall	.+0      	; 0xc2 <main+0x6>
+  c2:	00 d0       	rcall	.+0      	; 0xc4 <main+0x8>
+  c4:	1f 92       	push	r1
+  c6:	cd b7       	in	r28, 0x3d	; 61
+  c8:	de b7       	in	r29, 0x3e	; 62
+	uint8_t bright = 0;
+  ca:	19 82       	std	Y+1, r1	; 0x01
+	initPWM();
+  cc:	0e 94 36 00 	call	0x6c	; 0x6c <initPWM>
+	while(1)
+	{
+		for(bright = 0;bright < 255;bright++)
+  d0:	19 82       	std	Y+1, r1	; 0x01
+  d2:	10 c0       	rjmp	.+32     	; 0xf4 <main+0x38>
+		{
+			setDuty(bright);
+  d4:	89 81       	ldd	r24, Y+1	; 0x01
+  d6:	0e 94 4f 00 	call	0x9e	; 0x9e <setDuty>
+  da:	80 e8       	ldi	r24, 0x80	; 128
+  dc:	9c e0       	ldi	r25, 0x0C	; 12
+  de:	9b 83       	std	Y+3, r25	; 0x03
+  e0:	8a 83       	std	Y+2, r24	; 0x02
+    milliseconds can be achieved.
+ */
+void
+_delay_loop_2(uint16_t __count)
+{
+	__asm__ volatile (
+  e2:	8a 81       	ldd	r24, Y+2	; 0x02
+  e4:	9b 81       	ldd	r25, Y+3	; 0x03
+  e6:	01 97       	sbiw	r24, 0x01	; 1
+  e8:	f1 f7       	brne	.-4      	; 0xe6 <main+0x2a>
+  ea:	9b 83       	std	Y+3, r25	; 0x03
+  ec:	8a 83       	std	Y+2, r24	; 0x02
+{
+	uint8_t bright = 0;
+	initPWM();
+	while(1)
+	{
+		for(bright = 0;bright < 255;bright++)
+  ee:	89 81       	ldd	r24, Y+1	; 0x01
+  f0:	8f 5f       	subi	r24, 0xFF	; 255
+  f2:	89 83       	std	Y+1, r24	; 0x01
+  f4:	89 81       	ldd	r24, Y+1	; 0x01
+  f6:	8f 3f       	cpi	r24, 0xFF	; 255
+  f8:	69 f7       	brne	.-38     	; 0xd4 <main+0x18>
+		{
+			setDuty(bright);
+			_delay_loop_2(3200);
+		}
+		for(bright = 255;bright > 0;bright--)
+  fa:	8f ef       	ldi	r24, 0xFF	; 255
+  fc:	89 83       	std	Y+1, r24	; 0x01
+  fe:	10 c0       	rjmp	.+32     	; 0x120 <main+0x64>
+		{
+			setDuty(bright);
+ 100:	89 81       	ldd	r24, Y+1	; 0x01
+ 102:	0e 94 4f 00 	call	0x9e	; 0x9e <setDuty>
+ 106:	80 e8       	ldi	r24, 0x80	; 128
+ 108:	9c e0       	ldi	r25, 0x0C	; 12
+ 10a:	9d 83       	std	Y+5, r25	; 0x05
+ 10c:	8c 83       	std	Y+4, r24	; 0x04
+ 10e:	8c 81       	ldd	r24, Y+4	; 0x04
+ 110:	9d 81       	ldd	r25, Y+5	; 0x05
+ 112:	01 97       	sbiw	r24, 0x01	; 1
+ 114:	f1 f7       	brne	.-4      	; 0x112 <main+0x56>
+ 116:	9d 83       	std	Y+5, r25	; 0x05
+ 118:	8c 83       	std	Y+4, r24	; 0x04
+		for(bright = 0;bright < 255;bright++)
+		{
+			setDuty(bright);
+			_delay_loop_2(3200);
+		}
+		for(bright = 255;bright > 0;bright--)
+ 11a:	89 81       	ldd	r24, Y+1	; 0x01
+ 11c:	81 50       	subi	r24, 0x01	; 1
+ 11e:	89 83       	std	Y+1, r24	; 0x01
+ 120:	89 81       	ldd	r24, Y+1	; 0x01
+ 122:	88 23       	and	r24, r24
+ 124:	69 f7       	brne	.-38     	; 0x100 <main+0x44>
+		{
+			setDuty(bright);
+			_delay_loop_2(3200);
+		}
+	}
+ 126:	d4 cf       	rjmp	.-88     	; 0xd0 <main+0x14>
+
+00000128 <_exit>:
+ 128:	f8 94       	cli
+
+0000012a <__stop_program>:
+ 12a:	ff cf       	rjmp	.-2      	; 0x12a <__stop_program>
